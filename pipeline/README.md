@@ -16,3 +16,13 @@ Shared code is in `pipeline/lib/books.py` (book table, reference parser). Its se
 
 Final record keys: `id, files, source_urls{filedn, commons}, width, height, sha256, sha256_610, passages[], also_in_obs[]`, plus a `_work` object (Commons titles and scene titles) that is dropped before publishing.
 St-Takla caption text is never stored; only the parsed reference.
+
+## Tagging pilot (PR 3)
+
+| Step | Command | What it does |
+|------|---------|--------------|
+| pilot | `python3 pipeline/pilot_select.py` | Picks the 50-picture pilot sample (seeded) into `work/pilot.json` |
+| 06 | `python3 pipeline/06_tag.py --ids work/pilot.json` | Tags pictures with `anthropic/claude-sonnet-5.5` through OpenRouter; one file per picture in `work/tags/`; Berean Standard Bible text (public domain) goes into the prompt only. About $0.01 per picture. Needs `OPENROUTER_API_KEY` |
+| review | `python3 pipeline/review_data.py prep --ids work/pilot.json --name pilot`, upload `work/review/pilot/images/` to the review artifact, then `... page --name pilot` | Builds the review page from `review_page.html` |
+
+For a picture with a harvested reference the model only says whether it agrees (`passage_check`); it proposes a reference (`source: vision`, always flagged) only when none was harvested. A named person survives only if the name appears in the verse text of one of the picture's passages. The flag `uncertain` appears on nearly every picture, so review queues should use the other flags.
