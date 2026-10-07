@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 WORK = ROOT / "work"
 UA = "read-n-grow-dataset/0.1 (benjamin.wright@unfoldingword.org)"
 URL = "https://st-takla.org/Gallery/Bible/Illustrations/sm/{album}/sweet-bible-{code}.html"
-ITEM = re.compile(r"^(\d?[A-Za-z]+)_(\d+)_(\d+)([a-z]?)$")
+ITEM = re.compile(r"^(\d?[A-Za-z]+)_(\d+)_(\d+)([a-z]\d*)?$")
 RG = re.compile(r"^(\d{2})_([A-Za-z0-9]+)_(\d{2,3})_(\d{2,3})([a-z]\d*)?_RG\.jpg$")
 LDJSON = re.compile(r'<script type="application/ld\+json">(\{"@context".*?)</script>', re.S)
 REF_IN_DESC = re.compile(r"\(((?:[1-3]\s?)?[A-Z][A-Za-z ]*?\s*\d+\s*:\s*\d[^()]*)\)")  # first English "(Book n: n)"
@@ -79,7 +79,7 @@ def main():
     for it in items:
         album, name = it.split("/sweet-bible-")
         m = ITEM.match(name)
-        key = (m.group(1).lower(), int(m.group(2)), m.group(3).zfill(2), m.group(4)) if m else None
+        key = (m.group(1).lower(), int(m.group(2)), m.group(3).zfill(2), m.group(4) or "") if m else None
         if key in rg_key:
             todo.append((album, name, rg_key[key]))
         else:
