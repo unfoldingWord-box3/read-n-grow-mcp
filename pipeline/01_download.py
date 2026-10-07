@@ -32,6 +32,14 @@ def listing(path):
     return json.loads(re.search(r"var directLinkData=(\{.*?\});", html, re.S).group(1))["content"]
 
 
+SAFE_NAME = re.compile(r"[A-Za-z0-9_]+\.jpg", re.I)
+
+
+def ok_entry(e):
+    """Listing entries come from a third-party share: accept only plain file names with an integer size."""
+    return isinstance(e.get("size"), int) and bool(SAFE_NAME.fullmatch(e.get("name", "")))
+
+
 def build_file_list():
     files = []  # (variant, folder, name, size)
     for d in listing(""):
@@ -39,10 +47,10 @@ def build_file_list():
         if not re.fullmatch(r"\d{2}", folder):
             continue
         for e in listing(folder + "/"):
-            if "size" in e and e["name"].lower().endswith(".jpg"):
+            if ok_entry(e):
                 files.append(("full", folder, e["name"], e["size"]))
         for e in listing(folder + "/610px/"):
-            if "size" in e and e["name"].lower().endswith(".jpg"):
+            if ok_entry(e):
                 files.append(("610", folder, e["name"], e["size"]))
         time.sleep(0.25)
     return files

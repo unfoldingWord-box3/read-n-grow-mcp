@@ -42,10 +42,9 @@ def parse_caption(caption, page_book=""):
         if page_book and re.match(r"^\d+\s*:", piece):
             piece = page_book + " " + piece
         p, u = parse_references(piece)
-        passages += p
-        if p:
-            unparsed += u
-        elif HAS_REF.search(piece):
+        if p and not u:
+            passages += p
+        elif p or HAS_REF.search(piece):  # partly parsed: keep nothing, so a lost reference is not hidden
             unparsed.append(piece)
         elif title is None:
             title = piece

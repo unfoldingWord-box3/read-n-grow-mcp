@@ -96,7 +96,8 @@ def _alias_map():
             variants = {n}
             if n[0].isdigit():
                 variants.add(n.replace(" ", "", 1))
-                variants.add(_ROMAN[n[0]] + " " + n[2:])
+                if n[1] == " ":  # roman variants of spaced names only ("1 Samuel"), never of codes like "1Sa"
+                    variants.add(_ROMAN[n[0]] + " " + n[2:])
             for v in variants:
                 m[v.lower()] = usfm
     return m
@@ -105,7 +106,7 @@ def _alias_map():
 _ALIASES = _alias_map()
 _BOOK_RE = re.compile(
     r"(?<![A-Za-z0-9])(" + "|".join(
-        re.escape(a).replace(r"\ ", r"\s*") for a in sorted(_ALIASES, key=len, reverse=True)
+        re.escape(a).replace(r"\ ", r"\s+") for a in sorted(_ALIASES, key=len, reverse=True)
     ) + r")\.?\s*(?=\d)", re.I)
 _ITEM_RE = re.compile(r"^(\d+)[a-z]?(?:\s*[-–]\s*(?:(\d+)\s*:\s*)?(\d+)[a-z]?)?$", re.I)
 _CHAP_RE = re.compile(r"^(\d+)(?:\s*[-–]\s*(\d+))?$")
@@ -130,6 +131,9 @@ def _make(book, ch, vs, ve, ch_end=None):
     return p
 
 
+_SINGLE_CHAPTER = {"OBA", "PHM", "2JN", "3JN", "JUD"}  # a lone number after these is a verse of chapter 1
+
+
 def _parse_body(book, body, unparsed):
     out, cur = [], None
     for seg in body.split(";"):
@@ -139,8 +143,18 @@ def _parse_body(book, body, unparsed):
         m = re.match(r"^(\d+)\s*:\s*(.*)$", seg)
         if m:
             cur, rest = int(m.group(1)), m.group(2)
+            if cur < 1:
+                unparsed.append(f"{book} {seg}")
+                continue
+        elif cur is not None and _ITEM_RE.match(seg.split(",")[0].strip()):
+            rest = seg  # "35:1-7; 9-15": the sources use ";" between verse ranges of one chapter
+        elif book in _SINGLE_CHAPTER and cur is None:
+            cur, rest = 1, seg
         elif _CHAP_RE.match(seg):
             a, b = _CHAP_RE.match(seg).groups()
+            if int(a) < 1 or (b and int(b) <= int(a)):
+                unparsed.append(f"{book} {seg}")
+                continue
             out.append(_make(book, int(a), None, None, int(b) if b else None))
             cur = None
             continue
@@ -166,9 +180,13 @@ def _parse_body(book, body, unparsed):
                     ch_end = int(e_ch)
                 elif ve < vs and len(e_raw) < len(s_raw):  # "15-6" means 15-16
                     ve = int(s_raw[:len(s_raw) - len(e_raw)] + e_raw)
-                if ch_end == cur and ve < vs:
-                    unparsed.append(f"{book} {cur}:{item}")
-                    continue
+                    if ve <= vs:
+                        ve = -1
+                if ch_end < cur or (ch_end == cur and ve < vs):
+                    ve = -1
+            if vs < 1 or ve < 1:
+                unparsed.append(f"{book} {cur}:{item}")
+                continue
             out.append(_make(book, cur, vs, ve, ch_end))
     return out
 
@@ -231,4 +249,10 @@ if __name__ == "__main__":
     assert p == [] and u
     p, u = parse_references("Luke 4:x")
     assert p == [] and u == ["LUK 4:x"], u
+    for bad in ("Jesus in 2", "Peter in 12", "in 3 days", "SongofSongs 2:1", "Luke 3:3-2:1", "Genesis 5-2",
+                "Luke 0:0", "Luke 1:25-5"):
+        assert parse_references(bad)[0] == [] or parse_references(bad)[1], bad
+    assert [x["ref"] for x in one("Genesis 35: 1-7; 9-15")] == ["GEN 35:1-7", "GEN 35:9-15"]
+    assert one("Jude 3")[0]["ref"] == "JUD 1:3" and one("3 John 4")[0]["ref"] == "3JN 1:4"
+    assert [x["ref"] for x in one("Genesis 1; 3")] == ["GEN 1", "GEN 3"]
     print("books.py self-test passed")

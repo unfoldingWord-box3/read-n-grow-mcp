@@ -16,7 +16,8 @@ byte-identical Commons files, came from checks that are not recorded here.
 | `takla_items.txt` | St-Takla item names (names only, no caption text) | Item names only |
 | `rg_uncovered.txt` | RG files with no St-Takla item | Derived |
 | `obs_to_sweet.csv` | Open Bible Stories frame to Sweet picture, by image matching | Derived |
-| `fbi_all_sets.csv` | FreeBibleimages Sweet story sets, no header row; kept as evidence only, not used by the dataset | freebibleimages.org; its own terms apply |
 | `vision_pilot_6img_results.jsonl`, `vision_pilot_tag.py` | The 6-image model comparison and its script | Our own work |
 
 CSV files use CRLF line endings.
+
+`fbi_all_sets.csv` (FreeBibleimages story-set descriptions) was removed from the repository after PR review because it republishes third-party text; it remains in the git history of PR #1. The report's section 2, F15 counts came from it.

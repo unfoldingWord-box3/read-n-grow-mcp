@@ -39,7 +39,7 @@ def sha1_of(path):
 
 def main():
     rows = list(csv.DictReader(open(WORK / "manifest.csv")))
-    full = {r["filename"]: r for r in rows if r["variant"] == "full"}
+    full = {r["filename"]: r for r in rows if r["variant"] == "full" and int(r["size_bytes"]) > 0}
     small = {r["filename"]: r for r in rows if r["variant"] == "610"}  # includes 25 empty files on the share
     small_ok = {n: r for n, r in small.items() if int(r["size_bytes"]) > 0}
     # One picture = files sharing full-size bytes OR 610px bytes. Six full-size pairs differ by about 60

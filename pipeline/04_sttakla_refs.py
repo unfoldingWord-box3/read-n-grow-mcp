@@ -53,6 +53,8 @@ def reference_of(html):
         return None
     try:
         desc = json.loads(m.group(1)).get("description", "")
+        if not isinstance(desc, str):
+            desc = ""
     except ValueError:
         return None
     r = REF_IN_DESC.search(desc)
