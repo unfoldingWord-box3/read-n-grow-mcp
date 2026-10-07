@@ -1,0 +1,231 @@
+<title>Illustration Review</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:wght@600;700&display=swap">
+<style>
+/* Layout: sticky score bar, then one card per picture: picture on the left, tags and the five rubric marks on the right. */
+:root {
+  --bg: #f6f9fb; --surface: #ffffff; --fg: #231f20; --muted: #5d6a72; --line: #d5e0e6;
+  --head: #014263; --accent: #1d86b5; --accent-soft: #e3f3fa; --teal: #3a9a9e; --teal-soft: #e2f4f5;
+  --warn: #9a5b00; --warn-soft: #fbefd9; --pass: #1c7a4a; --pass-soft: #e0f3e8; --fail: #b3261e; --fail-soft: #fbe5e3;
+  --font-body: "Source Sans 3", system-ui, sans-serif; --font-head: "Source Serif 4", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1a22; --surface: #12262f; --fg: #e8eff2; --muted: #9db0ba; --line: #264452;
+  --head: #8fd3f1; --accent: #5fc0ea; --accent-soft: #123a4c; --teal: #70c9cc; --teal-soft: #123b3e;
+  --warn: #f0b45c; --warn-soft: #3d2d10; --pass: #6fd49b; --pass-soft: #12382a; --fail: #ff9a92; --fail-soft: #46201d; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0b1a22; --surface: #12262f; --fg: #e8eff2; --muted: #9db0ba; --line: #264452;
+  --head: #8fd3f1; --accent: #5fc0ea; --accent-soft: #123a4c; --teal: #70c9cc; --teal-soft: #123b3e;
+  --warn: #f0b45c; --warn-soft: #3d2d10; --pass: #6fd49b; --pass-soft: #12382a; --fail: #ff9a92; --fail-soft: #46201d; color-scheme: dark; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.45; padding-inline: 16px; padding-block: 0 48px; }
+.wrap { max-width: 1100px; margin: 0 auto; }
+h1, h2 { font-family: var(--font-head); color: var(--head); text-wrap: balance; margin: 0; }
+h1 { font-size: 1.5rem; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); padding-block: 12px; margin-bottom: 16px; }
+.bar-top { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; justify-content: space-between; }
+.sub { color: var(--muted); margin: 2px 0 0; }
+.gate { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin-top: 10px; }
+.gate > div { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; min-width: 0; }
+.gate b { display: block; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.gate small { color: var(--muted); }
+.gate .ok b { color: var(--pass); } .gate .bad b { color: var(--fail); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.tools label { color: var(--muted); font-size: 0.85rem; }
+select, input[type=text], textarea { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; min-width: 0; }
+textarea { width: 100%; resize: vertical; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 18px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 16px; padding: 14px; }
+@media (max-width: 760px) { .card { grid-template-columns: minmax(0, 1fr); } }
+.pic img { width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--line); display: block; background: var(--accent-soft); aspect-ratio: 4 / 3; object-fit: contain; }
+.pic .noimg { aspect-ratio: 4 / 3; display: grid; place-items: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 4px; }
+.files { color: var(--muted); font-size: 0.82rem; word-break: break-all; margin-top: 6px; }
+.stratum { display: inline-block; font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--teal); font-weight: 700; }
+h2 { font-size: 1.05rem; margin-block: 2px 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+.chip { font-size: 0.78rem; border-radius: 99px; padding: 1px 9px; background: var(--accent-soft); color: var(--head); border: 1px solid transparent; }
+.chip.src-commons { background: var(--pass-soft); color: var(--pass); }
+.chip.src-sttakla { background: var(--teal-soft); color: var(--fg); }
+.chip.src-vision, .chip.flag { background: var(--warn-soft); color: var(--warn); }
+.chip.low { background: var(--fail-soft); color: var(--fail); }
+dl { margin: 8px 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 3px 12px; }
+dt { color: var(--muted); font-size: 0.85rem; } dd { margin: 0; }
+.unc { color: var(--warn); font-size: 0.88rem; margin: 6px 0 0; padding-left: 18px; }
+.marks { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 6px; }
+.mark { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.mark span { min-width: 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { font: inherit; background: var(--surface); color: var(--muted); border: 0; padding: 4px 12px; cursor: pointer; min-width: 52px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button.on-pass { background: var(--pass-soft); color: var(--pass); font-weight: 700; }
+.seg button.on-fail { background: var(--fail-soft); color: var(--fail); font-weight: 700; }
+.seg button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.verdict { font-weight: 700; margin-top: 4px; }
+.verdict.pass { color: var(--pass); } .verdict.fail { color: var(--fail); } .verdict.open { color: var(--muted); font-weight: 600; }
+.note { margin-top: 6px; }
+.empty { padding: 28px; text-align: center; color: var(--muted); }
+#status { font-size: 0.85rem; color: var(--muted); }
+</style>
+<div class="wrap">
+  <div class="bar">
+    <div class="bar-top">
+      <div><h1 id="title"></h1><p class="sub" id="subtitle"></p></div>
+      <div id="status" role="status"></div>
+    </div>
+    <div class="gate" id="gate"></div>
+    <div class="tools">
+      <label for="who">Reviewer</label><input type="text" id="who" placeholder="Your name" autocomplete="name">
+      <label for="filter">Show</label>
+      <select id="filter">
+        <option value="all">All pictures</option><option value="open">Not finished</option>
+        <option value="fail">Failing</option><option value="flagged">Model flags</option>
+      </select>
+    </div>
+  </div>
+  <div id="list"></div>
+</div>
+<script>
+const DATA = /*DATA*/null;
+const IMGS = /*IMGS*/{};
+const RUBRIC = DATA.rubric;
+const marks = {};   // id -> {items:{key:true|false}, note, by}
+let db = null;
+
+const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+const chips = (arr, cls) => { const d = el("div", "chips"); (arr || []).forEach(x => d.appendChild(el("span", "chip " + (cls || ""), x))); return d; };
+const verdictOf = id => {
+  const m = (marks[id] || {}).items || {};
+  const vals = RUBRIC.map(r => m[r.key]);
+  if (vals.some(v => v === false)) return "fail";
+  return vals.every(v => v === true) ? "pass" : "open";
+};
+
+function score() {
+  const rows = DATA.items;
+  const n = rows.length, pass = rows.filter(r => verdictOf(r.id) === "pass").length;
+  const fail = rows.filter(r => verdictOf(r.id) === "fail").length;
+  const wrongId = rows.filter(r => ((marks[r.id] || {}).items || {}).identity === false).length;
+  const key = rows.filter(r => r.answer_key);
+  const keyDone = key.filter(r => ((marks[r.id] || {}).items || {}).ref !== undefined);
+  const keyOk = keyDone.filter(r => marks[r.id].items.ref === true).length;
+  const g = document.getElementById("gate");
+  g.replaceChildren();
+  const tile = (cls, big, small) => { const d = el("div", cls); d.append(el("b", "", big), el("small", "", small)); g.appendChild(d); };
+  const need = DATA.gate;
+  if (need) {
+    tile(pass >= need.min_pass ? "ok" : "", `${pass} of ${n} pass`, `needs at least ${need.min_pass}; ${fail} failing, ${n - pass - fail} not finished`);
+    const idDone = rows.filter(r => ((marks[r.id] || {}).items || {}).identity !== undefined).length;
+    tile(wrongId > 0 ? "bad" : (idDone === n ? "ok" : ""), `${wrongId} wrong identities`, `needs none; ${idDone} of ${n} checked`);
+    if (key.length) tile(keyDone.length && keyOk / keyDone.length < need.ref_match ? "bad" : (keyDone.length === key.length ? "ok" : ""),
+      `${keyOk} of ${keyDone.length} references match`, `Commons-captioned pictures, needs ${Math.round(need.ref_match * 100)}%; ${keyDone.length} of ${key.length} checked`);
+  } else {
+    tile(pass === n ? "ok" : "", `${pass} of ${n} reviewed OK`, `${fail} failing, ${n - pass - fail} not finished`);
+  }
+}
+
+function save(id) {
+  const m = marks[id]; if (!db) return;
+  const done = RUBRIC.every(r => m.items[r.key] !== undefined);
+  const doc = { items: m.items, note: m.note || "", by: document.getElementById("who").value.trim(), verdict: verdictOf(id),
+                reviewed_by: done ? (document.getElementById("who").value.trim() || null) : null, at: new Date().toISOString() };
+  m.by = doc.by;
+  db.collection(DATA.collection).doc(id).set(doc).then(
+    () => setStatus("Saved"), e => setStatus("Could not save: " + (e && e.message || e)));
+}
+function setStatus(t) { document.getElementById("status").textContent = t; }
+
+function card(r) {
+  const c = el("article", "card"); c.id = "c-" + r.id; c.dataset.id = r.id;
+  const pic = el("div", "pic");
+  if (IMGS[r.id]) { const i = el("img"); i.src = IMGS[r.id]; i.alt = r.tags.scene_summary; i.loading = "lazy"; pic.appendChild(i); }
+  else pic.appendChild(el("div", "noimg", "Picture not loaded"));
+  pic.appendChild(el("div", "files", r.files.join(", ")));
+  const body = el("div");
+  body.appendChild(el("span", "stratum", r.stratum));
+  body.appendChild(el("h2", "", r.tags.scene_summary));
+  const pc = el("div", "chips");
+  if (!r.passages.length) pc.appendChild(el("span", "chip flag", "no reference harvested"));
+  r.passages.forEach(p => pc.appendChild(el("span", "chip src-" + p.source + (p.confidence === "low" ? " low" : ""), `${p.ref} · ${p.source} · ${p.confidence}`)));
+  if (r.proposed_passage) pc.appendChild(el("span", "chip src-vision", `model proposes ${r.proposed_passage.ref}`));
+  body.appendChild(pc);
+  const dl = el("dl");
+  const row = (k, v) => { if (v == null || v === "" || (Array.isArray(v) && !v.length)) return; dl.append(el("dt", "", k), el("dd", "", Array.isArray(v) ? v.join("; ") : String(v))); };
+  const ppl = r.tags.people.map(p => p.identity ? `${p.label} = ${p.identity}` : p.label);
+  row("People", ppl); row("Count", r.tags.figure_count); row("Places", r.tags.places); row("Objects", r.tags.objects);
+  row("Actions", r.tags.actions); row("Setting", `${r.tags.setting}, ${r.tags.time_of_day}${r.tags.mood ? ", " + r.tags.mood : ""}`);
+  row("Model on reference", `${r.tags.passage_check.verdict}: ${r.tags.passage_check.note}`);
+  body.appendChild(dl);
+  if (r.flags.length) body.appendChild(chips(r.flags.filter(f => f !== "uncertain"), "flag"));
+  if (r.tags.uncertain.length) { const u = el("ul", "unc"); r.tags.uncertain.forEach(x => u.appendChild(el("li", "", x))); body.appendChild(u); }
+  const mk = el("div", "marks");
+  RUBRIC.forEach(rb => {
+    const d = el("div", "mark"); d.appendChild(el("span", "", rb.label));
+    const seg = el("div", "seg"); seg.dataset.key = rb.key;
+    [["Pass", true], ["Fail", false]].forEach(([lab, val]) => {
+      const b = el("button", "", lab); b.type = "button"; b.dataset.val = val;
+      b.setAttribute("aria-label", `${rb.label}: ${lab}`);
+      b.onclick = () => {
+        const m = marks[r.id] = marks[r.id] || { items: {}, note: "" };
+        if (m.items[rb.key] === val) delete m.items[rb.key]; else m.items[rb.key] = val;
+        paint(r.id); save(r.id); score();
+      };
+      seg.appendChild(b);
+    });
+    d.appendChild(seg); mk.appendChild(d);
+  });
+  const note = el("textarea"); note.id = "note-" + r.id; note.rows = 2; note.placeholder = "Note (what is wrong, or what the picture really shows)";
+  note.setAttribute("aria-label", "Note for " + r.files[0]);
+  note.onchange = () => { const m = marks[r.id] = marks[r.id] || { items: {}, note: "" }; m.note = note.value; save(r.id); };
+  const v = el("div", "verdict open"); v.id = "v-" + r.id;
+  mk.append(note, v); body.appendChild(mk);
+  c.append(pic, body);
+  return c;
+}
+
+function paint(id) {
+  const c = document.getElementById("c-" + id); if (!c) return;
+  const m = marks[id] || { items: {}, note: "" };
+  c.querySelectorAll(".seg").forEach(seg => seg.querySelectorAll("button").forEach(b => {
+    const on = m.items[seg.dataset.key] === (b.dataset.val === "true") && m.items[seg.dataset.key] !== undefined;
+    b.className = on ? (b.dataset.val === "true" ? "on-pass" : "on-fail") : "";
+  }));
+  const note = c.querySelector("textarea"); if (document.activeElement !== note) note.value = m.note || "";
+  const v = verdictOf(id), vEl = document.getElementById("v-" + id);
+  vEl.className = "verdict " + v;
+  vEl.textContent = v === "pass" ? "Passes" : v === "fail" ? "Fails" : "Not finished";
+  applyFilter();
+}
+
+function applyFilter() {
+  const f = document.getElementById("filter").value;
+  let shown = 0;
+  DATA.items.forEach(r => {
+    const c = document.getElementById("c-" + r.id), v = verdictOf(r.id);
+    const ok = f === "all" || (f === "open" && v !== "pass" && v !== "fail") || (f === "fail" && v === "fail") ||
+               (f === "flagged" && r.flags.some(x => x !== "uncertain"));
+    c.hidden = !ok; if (ok) shown++;
+  });
+  document.getElementById("empty").hidden = shown > 0;
+}
+
+function build() {
+  document.getElementById("title").textContent = DATA.title;
+  document.getElementById("subtitle").textContent = DATA.subtitle;
+  const list = document.getElementById("list");
+  DATA.items.forEach(r => list.appendChild(card(r)));
+  const e = el("div", "empty", "Nothing matches this filter."); e.id = "empty"; e.hidden = true; list.appendChild(e);
+  DATA.items.forEach(r => paint(r.id));
+  document.getElementById("filter").onchange = applyFilter;
+  try { document.getElementById("who").value = localStorage.getItem("reviewer") || ""; } catch (e) {}
+  document.getElementById("who").onchange = ev => { try { localStorage.setItem("reviewer", ev.target.value); } catch (e) {} };
+  score();
+}
+
+build();
+(async () => {
+  db = await (window.claude ? window.claude.use("db") : null);
+  if (!db) { setStatus("Marks are not being saved: sign in to the viewer to save."); return; }
+  setStatus("Loading saved marks…");
+  db.collection(DATA.collection).onSnapshot(snap => {
+    snap.docs.forEach(d => { const x = d.data() || {}; marks[d.id] = { items: x.items || {}, note: x.note || "", by: x.by || "" }; });
+    DATA.items.forEach(r => paint(r.id)); score(); setStatus("Saved marks loaded");
+  }, e => setStatus("Could not load marks: " + (e && e.message || e)));
+})();
+</script>
