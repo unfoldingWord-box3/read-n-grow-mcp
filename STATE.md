@@ -22,7 +22,8 @@ dataset is Phase 2 and is planned separately. Research record:
 - Odd file names: `EX` and `LK` in capitals, `Jb_02_04a1`, `19_Ps_119_01`
   (three-digit chapter), `10_2Sa_31_03` (probably 1 Samuel 31), and two `54_1Ti`
   files in the Romans folder.
-- St-Takla.org: we take its verse references only (versification is a fact).
+- St-Takla.org: Benjamin decided (D8) that we may use its verse references only
+  (versification is a fact); the lawyer review in the report's section 5 Q1 is still open.
   Never store or republish its caption text, which quotes copyrighted Bible
   translations and FreeBibleimages text.
 - A picture may name a person only if that name appears in the verse text of one
@@ -31,14 +32,15 @@ dataset is Phase 2 and is planned separately. Research record:
 ## Licenses
 
 - Images: CC BY-SA 3.0 (Sweet Publishing). Not redistributed in this repo.
-- Tags and references we generate: CC BY-SA 4.0.
+- Tags and references we generate: CC BY-SA 4.0 (our default; the lawyer
+  review in report section 5, Q2 is still open).
 - Credit line (default until unfoldingWord answers report Q3): `Illustration by
   Jim Padgett, © Sweet Publishing, from the Read 'n Grow Picture Bible. CC BY-SA
   3.0 https://creativecommons.org/licenses/by-sa/3.0/`
 
 ## Open blockers (people, not code)
 
-- Report Q1/Q2: lawyer review of St-Takla references and of the license on AI tags.
-- Report Q3: canonical credit line. Q7: who owns the filedn.com account.
-- Signal gateway sends the engine API key to any attachment host (report F21);
-  belongs to the BT Servant team.
+- Report section 5, Q1/Q2: lawyer review of St-Takla references and of the license on AI tags.
+- Report section 5, Q3: canonical credit line. Q7: who owns the filedn.com account.
+- A credential-handling problem in the BT Servant Signal gateway (report F21)
+  belongs to the BT Servant team; details are deliberately not in this public repo.

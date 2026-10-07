@@ -2,6 +2,8 @@
 
 Date: 2026-10-07. Prepared for Benjamin (project lead). Research only; nothing was built. Evidence files are in `research/data/` (listed in section 8).
 
+> **Update after this report (2026-10-07).** Benjamin has decided D8 (St-Takla verse references may be used; its caption text is never stored) and D9 (the MCP server will be its own standalone server). Work is phased: Phase 1 is the open dataset only; the MCP server is Phase 2. Q-numbers in section 5 are the open questions; the Q1-Q7 labels on the findings headings in section 2 are a separate numbering.
+
 ## 1. Verdict
 
 **Go with changes.** Most of the passage data already exists and costs nothing to harvest, and the vision tagging is cheap (about $25 for the whole set), so this is worth building. The project needs a narrower pitch and a different first step, though. unfoldingWord's own fia-mcp server already returns images by passage, so this project's new contribution is narrative scene illustrations and search by what a picture shows. The first step is to harvest the existing references and deduplicate the files before any AI tagging.
@@ -130,7 +132,7 @@ The test run cost $0.125 in total. The extrapolation assumes the remaining pictu
 
 **F21. Credential leak in the Signal gateway (security).**
 - Claim: before it sends an attachment, the Signal gateway downloads the URL and sends the engine API key as a Bearer header to whatever host the URL points at. Today the attachments come from the worker. If image attachments ever point at R2, Commons or any other outside host, the key goes to that host.
-- Evidence: bt-servant-signal-gateway `src/bt_signal_gateway/media.py`, `download_to_temp`. The line `headers = {"Authorization": f"Bearer {settings.engine_api_key}"}` is applied to every URL (commit b353b75; I read it).
+- Evidence: bt-servant-signal-gateway, attachment download code in `media.py` (details withheld from this public repo; reported to the BT Servant team separately).
 - Confidence: high. This repo is not one of yours, so I filed nothing. It needs to go to the BT Servant team.
 
 **F22. MCP and hosting facts.**
@@ -323,6 +325,6 @@ Pages that failed:
 
 **Process note:** I did not file an or-misfire issue for the models that failed the tagging test, because it was a deliberate comparison, not delegated work. Say so if you want them logged.
 
-**Evidence files** (copied from session scratch into `research/data/`, not committed): `manifest.csv`, `sweet_dupgroups.json`, `rg_md5.txt`, `commons_map.csv`, `commons_passage_captions.csv`, `obs_to_sweet.csv`, `fbi_all_sets.csv`, `takla_items.txt`, `rg_uncovered.txt`, `zero_byte.txt`, `vision_pilot_6img_results.jsonl`, `vision_pilot_tag.py`.
+**Evidence files** (copied from session scratch into `research/data/`; see `research/data/README.md`): `manifest.csv`, `sweet_dupgroups.json`, `rg_md5.txt`, `commons_map.csv`, `commons_passage_captions.csv`, `obs_to_sweet.csv`, `fbi_all_sets.csv`, `takla_items.txt`, `rg_uncovered.txt`, `zero_byte.txt`, `vision_pilot_6img_results.jsonl`, `vision_pilot_tag.py`.
 
 **Biggest gap to close next:** the answer to Q1 on St-Takla, because it decides whether about 1,700 pictures need human review of AI-proposed references. The cheapest technical check is the staging test in build step 8, using a single hand-made record. It would show whether the WhatsApp and web path really works before any tagging money is spent.

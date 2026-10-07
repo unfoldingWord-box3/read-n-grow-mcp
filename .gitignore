@@ -2,3 +2,6 @@
 /graft/
 # Downloads and pipeline scratch (about 4 GB)
 /work/
+__pycache__/
+*.pyc
+.env
