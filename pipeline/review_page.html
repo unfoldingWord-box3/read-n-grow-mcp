@@ -111,9 +111,10 @@ function score() {
   const need = DATA.gate;
   if (need) {
     tile(pass >= need.min_pass ? "ok" : "", `${pass} of ${n} pass`, `needs at least ${need.min_pass}; ${fail} failing, ${n - pass - fail} not finished`);
-    tile(wrongId === 0 ? "ok" : "bad", `${wrongId} wrong identities`, "needs none");
-    if (key.length) tile(keyDone.length && keyOk / keyDone.length >= need.ref_match ? "ok" : (keyDone.length ? "bad" : ""),
-      `${keyOk} of ${keyDone.length} references match`, `Commons-captioned pictures, needs ${Math.round(need.ref_match * 100)}%; ${key.length} in this set`);
+    const idDone = rows.filter(r => ((marks[r.id] || {}).items || {}).identity !== undefined).length;
+    tile(wrongId > 0 ? "bad" : (idDone === n ? "ok" : ""), `${wrongId} wrong identities`, `needs none; ${idDone} of ${n} checked`);
+    if (key.length) tile(keyDone.length && keyOk / keyDone.length < need.ref_match ? "bad" : (keyDone.length === key.length ? "ok" : ""),
+      `${keyOk} of ${keyDone.length} references match`, `Commons-captioned pictures, needs ${Math.round(need.ref_match * 100)}%; ${keyDone.length} of ${key.length} checked`);
   } else {
     tile(pass === n ? "ok" : "", `${pass} of ${n} reviewed OK`, `${fail} failing, ${n - pass - fail} not finished`);
   }

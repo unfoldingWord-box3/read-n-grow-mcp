@@ -1,5 +1,5 @@
 """Berean Standard Bible text (public domain), used only inside tagging prompts, never stored in the dataset."""
-import collections, re, sys, urllib.request
+import collections, re, sys, threading, urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -9,21 +9,26 @@ URL = "https://bereanbible.com/bsb.txt"
 PATH = Path(__file__).resolve().parent.parent.parent / "work" / "bsb" / "bsb.txt"
 _LINE = re.compile(r"^(.+?) (\d+):(\d+)\t(.*)$")
 _cache = None
+_lock = threading.Lock()
 
 
 def load():
-    """{(usfm, chapter): {verse: text}}; downloads the plain-text file on first use."""
+    """{(usfm, chapter): {verse: text}}; downloads the plain-text file on first use. Safe to call from threads."""
     global _cache
-    if _cache is None:
-        if not PATH.exists():
-            PATH.parent.mkdir(parents=True, exist_ok=True)
-            req = urllib.request.Request(URL, headers={"User-Agent": "read-n-grow-dataset/0.1 (benjamin.wright@unfoldingword.org)"})
-            PATH.write_bytes(urllib.request.urlopen(req, timeout=60).read())
-        _cache = collections.defaultdict(dict)
-        for line in PATH.read_text(encoding="utf-8-sig").splitlines():
-            m = _LINE.match(line)
-            if m:
-                _cache[(books._book_of(m.group(1)), int(m.group(2)))][int(m.group(3))] = m.group(4).strip()
+    with _lock:
+        if _cache is None:
+            if not PATH.exists():
+                PATH.parent.mkdir(parents=True, exist_ok=True)
+                req = urllib.request.Request(URL, headers={"User-Agent": "read-n-grow-dataset/0.1 (benjamin.wright@unfoldingword.org)"})
+                tmp = PATH.with_name(PATH.name + ".part")
+                tmp.write_bytes(urllib.request.urlopen(req, timeout=60).read())
+                tmp.rename(PATH)
+            cache = collections.defaultdict(dict)
+            for line in PATH.read_text(encoding="utf-8-sig").splitlines():
+                m = _LINE.match(line)
+                if m:
+                    cache[(books._book_of(m.group(1)), int(m.group(2)))][int(m.group(3))] = m.group(4).strip()
+            _cache = cache  # published only when complete
     return _cache
 
 

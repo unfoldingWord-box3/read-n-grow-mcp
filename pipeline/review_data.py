@@ -28,17 +28,21 @@ TITLES = {"pilot": ("Pilot review: 50 pictures",
 def load_items(ids_file, strata=None):
     records = {r["id"]: r for r in json.load(open(WORK / "records.json"))}
     spec = json.load(open(ids_file))
+    spec_n = len(spec["ids"] if isinstance(spec, dict) else spec)
     ids = spec["ids"] if isinstance(spec, dict) else spec
     stratum = {i: s for s, v in (spec.get("strata", {}) if isinstance(spec, dict) else {}).items() for i in v}
     items = []
     for i in ids:
         t = json.load(open(WORK / "tags" / f"{i}.json"))
         if "tags" not in t:
+            print("warning: no usable tags for", i)
             continue
         r = records[i]
         items.append({"id": i, "files": r["files"], "stratum": stratum.get(i, "flagged").replace("_", " "),
                       "answer_key": stratum.get(i) == "gospel_commons_key", "passages": r["passages"],
                       "proposed_passage": t.get("proposed_passage"), "tags": t["tags"], "flags": t["flags"], "image": t["image"]})
+    if len(items) != spec_n:
+        sys.exit(f"only {len(items)} of {spec_n} pictures are tagged; finish 06_tag.py first")
     return items
 
 
